@@ -1,27 +1,29 @@
-# Meta.TypeMeta
 apiVersion: compute.controller.com/v1
 kind: Ec2Instance
-
-# Meta.ObjectMeta
 metadata:
+  annotations: 
+    hello: world
+  name: kubernetes-object-for-ec2
+  namespace: default
   labels:
     app.kubernetes.io/name: kube-controller
     app.kubernetes.io/managed-by: kustomize
-  name: ec2instance-sample
-# Instance spec
 spec:
-  # TODO(user): Add fields here
-  amiID: mydummyamiID
-  sshKey: my-keypair
-  type: t3-micro
+  # Required fields
+  instanceType: "t3.medium"
+  sshKey: "my-ssh-keypair"
   storage:
-    standard:
-      size: 10Gi
-    fast:
-      size: 50Gi
+    size: "20Gi"
+    type: "gp3"
 
-# Status and other information specific to the instance
-status:
-  phase: Running
-
- 
+  # Optional fields
+  amiID: "ami-0abcdef1234567890"
+  additionalStorage:
+    - size: "50Gi"
+      type: "gp3"
+    - size: "100Gi"
+      type: "io1"
+  tags:
+    environment: "development"
+    team: "backend"
+    project: "web-app"

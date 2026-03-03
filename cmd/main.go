@@ -46,6 +46,7 @@ var (
 )
 
 func init() {
+	// Add all built-in scheme of kubectl to the API server
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(computev1.AddToScheme(scheme))

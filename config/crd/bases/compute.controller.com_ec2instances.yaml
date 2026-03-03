@@ -39,19 +39,51 @@ spec:
           spec:
             description: spec defines the desired state of Ec2Instance
             properties:
+              additionalStorage:
+                items:
+                  properties:
+                    size:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                  - size
+                  - type
+                  type: object
+                type: array
               amiID:
                 description: foo is an example field of Ec2Instance. Edit ec2instance_types.go
                   to remove/update
                 type: string
+              instanceType:
+                type: string
+              region:
+                type: string
               sshKey:
                 type: string
-              type:
-                type: string
+              storage:
+                properties:
+                  size:
+                    type: string
+                  type:
+                    type: string
+                required:
+                - size
+                - type
+                type: object
+              tags:
+                additionalProperties:
+                  type: string
+                type: object
+            required:
+            - instanceType
+            - sshKey
+            - storage
             type: object
           status:
             description: status defines the observed state of Ec2Instance
             properties:
-              instanceID:
+              InstanceID:
                 type: string
               phase:
                 description: |-

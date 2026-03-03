@@ -18,11 +18,12 @@ package controller
 
 import (
 	"context"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	computev1 "github.com/mrudhulraj/kube-controller/api/v1"
 )
@@ -47,11 +48,55 @@ type Ec2InstanceReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/reconcile
 func (r *Ec2InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = logf.FromContext(ctx)
+	l := log.FromContext(ctx)
 
 	// TODO(user): your logic here
+	// Holds the current status regardless of the presence/absence/modified state of the ec2 instance
+	// r is reconciler webserver
+	ec2instance := &computev1.Ec2Instance{}
+	if err := r.Get(ctx, req.NamespacedName, ec2instance); err != nil {
+		return ctrl.Result{}, err
+	}
 
-	return ctrl.Result{}, nil
+	// Check If delete is already called
+	if !ec2instance.DeletionTimestamp.IsZero() {
+
+	}
+
+	// Check if instance is there
+	if ec2instance.Status.InstanceID != "" {
+	}
+
+	// Add Finalizer
+	// Create a new Instance
+	l.Info("=== CONTINUING WITH EC2 INSTANCE CREATION === ")
+
+	createdInstanceInfo, err := createEC2Instance(ec2instance)
+	if err != nil {
+		l.Error(err, "Failed to create EC2 instance")
+		return ctrl.Result{}, err
+	}
+
+	l.Info("=== ABOUT TO UPDATE STATUS - This will trigger reconcile loop again ===",
+		"instanceID", createdInstanceInfo.InstanceID,
+		"state", createdInstanceInfo.State)
+
+	ec2instance.Status.InstanceID = createdInstanceInfo.InstanceID
+	ec2instance.Status.State = createdInstanceInfo.State
+	ec2instance.Status.PublicIP = createdInstanceInfo.PublicIP
+	ec2instance.Status.PrivateIP = createdInstanceInfo.PrivateIP
+	ec2instance.Status.PublicDNS = createdInstanceInfo.PublicDNS
+	ec2instance.Status.PrivateDNS = createdInstanceInfo.PrivateDNS
+
+	err = r.Status().Update(ctx, ec2instance)
+	if err != nil {
+		l.Error(err, "Failed to update status")
+		// Kubernetes will retry with backoff
+		return ctrl.Result{}, err
+	}
+
+	l.Info("=== STATUS UPDATED - Reconcile loop will be triggered again ===")
+	return ctrl.Result{RequeueAfter: 1 * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

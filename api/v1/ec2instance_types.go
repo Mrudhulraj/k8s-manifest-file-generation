@@ -23,6 +23,11 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+type StorageConfig struct {
+	Size string `json:"size"`
+	Type string `json:"type"`
+}
+
 // Ec2InstanceSpec defines the desired state of Ec2Instance
 type Ec2InstanceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -32,9 +37,14 @@ type Ec2InstanceSpec struct {
 
 	// foo is an example field of Ec2Instance. Edit ec2instance_types.go to remove/update
 	// +optional
-	AmiID  string `json:"amiID,omitempty"`
-	SshKey string `json:"sshKey,omitempty"`
-	Type   string `json:"type,omitempty"`
+	AmiID             string            `json:"amiID"`
+	SshKey            string            `json:"sshKey"`
+	InstanceType      string            `json:"instanceType"`
+	Tags              map[string]string `json:"tags,omitempty"`
+	Storage           StorageConfig     `json:"storage"`
+	KeyPair           string            `json:"keyPair,omitempty"`
+	AdditionalStorage []StorageConfig   `json:"additionalStorage,omitempty"`
+	Region            string            `json:"region,omitempty"`
 }
 
 // Ec2InstanceStatus defines the observed state of Ec2Instance.
@@ -54,12 +64,14 @@ type Ec2InstanceStatus struct {
 	// - "Degraded": the resource failed to reach or maintain its desired state
 	//
 	// The status of each condition is one of True, False, or Unknown.
-	// +listType=map
-	// +listMapKey=type
 	// +optional
 	Phase      string `json:"phase,omitempty"`
-	InstanceID string `json:"instanceID,omitempty"`
-	PublicIP   string `json:"publicIP,omitempty"`
+	InstanceID string `json:"instanceId"`
+	PublicIP   string `json:"publicIP"`
+	PrivateIP  string `json:"privateIP"`
+	PublicDNS  string `json:"publicDNS"`
+	PrivateDNS string `json:"privateDNS"`
+	State      string `json:"state"`
 	// PrivateIP  string            `json:"privateIP,omitempty"`
 	// State      string            `json:"state,omitempty"`
 	// Tags       map[string]string `json:"tags,omitempty"`
@@ -94,6 +106,16 @@ type Ec2InstanceList struct {
 	Items           []Ec2Instance `json:"items"`
 }
 
+type CreatedInstanceInfo struct {
+	InstanceID string `json:"instanceId"`
+	PublicIP   string `json:"publicIP"`
+	PrivateIP  string `json:"privateIP"`
+	PublicDNS  string `json:"publicDNS"`
+	PrivateDNS string `json:"privateDNS"`
+	State      string `json:"state"`
+}
+
+// Register API to the schema
 func init() {
 	SchemeBuilder.Register(&Ec2Instance{}, &Ec2InstanceList{})
 }

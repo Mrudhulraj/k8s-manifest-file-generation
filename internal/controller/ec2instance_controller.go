@@ -60,14 +60,30 @@ func (r *Ec2InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	// Check If delete is already called
 	if !ec2instance.DeletionTimestamp.IsZero() {
+		l.Info("Has Deletion Timestamp, Instance is being deleted")
 
+		_, err := deleteEC2Instance(ctx, ec2instance)
+
+		if err != nil {
+			l.Error(err, "Failed to delete the EC2 Instance")
+			return ctrl.Result{Requeue: true}, err // Requeue request if it failed
+		}
+		return ctrl.Result{}, nil
 	}
 
 	// Check if instance is there
 	if ec2instance.Status.InstanceID != "" {
+		l.Info("Requesed object already exists in K8s.")
+		return ctrl.Result{}, nil
+	}
+	l.Info("Creating new instance")
+	// Add Finalizer
+	ec2instance.Finalizers = append(ec2instance.Finalizers, "ec2instance.compute.cloud.com")
+	if err := r.Update(ctx, ec2instance); err != nil {
+		l.Error(err, "Failed to add finalizer")
+		return ctrl.Result{Requeue: true}, err
 	}
 
-	// Add Finalizer
 	// Create a new Instance
 	l.Info("=== CONTINUING WITH EC2 INSTANCE CREATION === ")
 

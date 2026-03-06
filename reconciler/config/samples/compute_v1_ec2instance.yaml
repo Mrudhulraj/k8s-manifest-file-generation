@@ -1,0 +1,29 @@
+apiVersion: compute.controller.com/v1
+kind: Ec2Instance
+metadata:
+  annotations: 
+    hello: world
+  name: kubernetes-object-for-ec2
+  namespace: default
+  labels:
+    app.kubernetes.io/name: kube-controller
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  # Required fields
+  instanceType: "t3.micro"
+  sshKey: "ec2KeyPair"
+  storage:
+    size: "20Gi"
+    type: "gp3"
+
+  # Optional fields
+  amiID: "ami-0f3caa1cf4417e51b"
+  additionalStorage:
+    - size: "50Gi"
+      type: "gp3"
+    - size: "100Gi"
+      type: "io1"
+  tags:
+    environment: "development"
+    team: "backend"
+    project: "web-app"

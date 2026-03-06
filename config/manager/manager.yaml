@@ -60,11 +60,28 @@ spec:
       containers:
       - command:
         - /manager
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-creds
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-creds
+              key: AWS_SECRET_ACCESS_KEY
+        - name: AWS_REGION
+          valueFrom:
+            secretKeyRef:
+              name: aws-creds
+              key: AWS_REGION
         args:
           - --leader-elect
           - --health-probe-bind-address=:8081
-        image: controller:latest
+        image: ec2-controller:latest
         name: manager
+        imagePullPolicy: Never
         ports: []
         securityContext:
           readOnlyRootFilesystem: true

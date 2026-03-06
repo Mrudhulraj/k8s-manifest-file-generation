@@ -55,6 +55,10 @@ func (r *Ec2InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	// r is reconciler webserver
 	ec2instance := &computev1.Ec2Instance{}
 	if err := r.Get(ctx, req.NamespacedName, ec2instance); err != nil {
+		if client.IgnoreNotFound(err) == nil {
+			l.Info("Ec2 instance resource not found")
+			return ctrl.Result{}, nil
+		}
 		return ctrl.Result{}, err
 	}
 
@@ -68,6 +72,20 @@ func (r *Ec2InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			l.Error(err, "Failed to delete the EC2 Instance")
 			return ctrl.Result{Requeue: true}, err // Requeue request if it failed
 		}
+
+		finalizerName := "ec2instance.compute.cloud.com"
+		var updateFinalizer []string
+		for _, finalizer := range ec2instance.Finalizers {
+			if finalizer != finalizerName {
+				updateFinalizer = append(updateFinalizer, finalizer)
+			}
+		}
+
+		ec2instance.Finalizers = updateFinalizer
+		if err = r.Update(ctx, ec2instance); err != nil {
+			l.Error(err, "Failed to remove finalizer")
+			return ctrl.Result{}, err
+		}
 		return ctrl.Result{}, nil
 	}
 
@@ -77,6 +95,7 @@ func (r *Ec2InstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 	l.Info("Creating new instance")
+
 	// Add Finalizer
 	ec2instance.Finalizers = append(ec2instance.Finalizers, "ec2instance.compute.cloud.com")
 	if err := r.Update(ctx, ec2instance); err != nil {

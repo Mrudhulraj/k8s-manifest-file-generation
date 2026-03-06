@@ -10,14 +10,14 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
 spec:
   # Required fields
-  instanceType: "t3.medium"
-  sshKey: "my-ssh-keypair"
+  instanceType: "t3.micro"
+  sshKey: "ec2KeyPair"
   storage:
     size: "20Gi"
     type: "gp3"
 
   # Optional fields
-  amiID: "ami-0abcdef1234567890"
+  amiID: "ami-0f3caa1cf4417e51b"
   additionalStorage:
     - size: "50Gi"
       type: "gp3"

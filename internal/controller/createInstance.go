@@ -27,7 +27,7 @@ func createEC2Instance(ec2Instance *computev1.Ec2Instance) (createdInstanceInfo 
 	runInput := &ec2.RunInstancesInput{
 		ImageId:      aws.String(ec2Instance.Spec.AmiID),
 		InstanceType: ec2types.InstanceType(ec2Instance.Spec.InstanceType),
-		KeyName:      aws.String(ec2Instance.Spec.KeyPair),
+		KeyName:      aws.String(ec2Instance.Spec.SshKey),
 		MinCount:     aws.Int32(1),
 		MaxCount:     aws.Int32(1),
 	}

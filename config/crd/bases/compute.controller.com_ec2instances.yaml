@@ -40,6 +40,7 @@ spec:
             description: spec defines the desired state of Ec2Instance
             properties:
               additionalStorage:
+                description: KeyPair           string            `json:"keyPair,omitempty"`
                 items:
                   properties:
                     size:
@@ -83,7 +84,7 @@ spec:
           status:
             description: status defines the observed state of Ec2Instance
             properties:
-              InstanceID:
+              instanceId:
                 type: string
               phase:
                 description: |-
@@ -97,8 +98,23 @@ spec:
 
                   The status of each condition is one of True, False, or Unknown.
                 type: string
+              privateDNS:
+                type: string
+              privateIP:
+                type: string
+              publicDNS:
+                type: string
               publicIP:
                 type: string
+              state:
+                type: string
+            required:
+            - instanceId
+            - privateDNS
+            - privateIP
+            - publicDNS
+            - publicIP
+            - state
             type: object
         required:
         - spec

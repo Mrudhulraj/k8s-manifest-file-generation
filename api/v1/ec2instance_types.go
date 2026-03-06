@@ -37,14 +37,14 @@ type Ec2InstanceSpec struct {
 
 	// foo is an example field of Ec2Instance. Edit ec2instance_types.go to remove/update
 	// +optional
-	AmiID             string            `json:"amiID"`
-	SshKey            string            `json:"sshKey"`
-	InstanceType      string            `json:"instanceType"`
-	Tags              map[string]string `json:"tags,omitempty"`
-	Storage           StorageConfig     `json:"storage"`
-	KeyPair           string            `json:"keyPair,omitempty"`
-	AdditionalStorage []StorageConfig   `json:"additionalStorage,omitempty"`
-	Region            string            `json:"region,omitempty"`
+	AmiID        string            `json:"amiID"`
+	SshKey       string            `json:"sshKey"`
+	InstanceType string            `json:"instanceType"`
+	Tags         map[string]string `json:"tags,omitempty"`
+	Storage      StorageConfig     `json:"storage"`
+	// KeyPair           string            `json:"keyPair,omitempty"`
+	AdditionalStorage []StorageConfig `json:"additionalStorage,omitempty"`
+	Region            string          `json:"region,omitempty"`
 }
 
 // Ec2InstanceStatus defines the observed state of Ec2Instance.
